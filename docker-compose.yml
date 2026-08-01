@@ -1,0 +1,65 @@
+services:
+  driver-db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: driver_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - driver-db-data:/var/lib/postgresql/data
+
+  reservation-db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: reservation_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - reservation-db-data:/var/lib/postgresql/data
+
+  driver-service:
+    build: ./driver-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://driver-db:5432/driver_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8081:8081"
+    depends_on:
+      - driver-db
+
+  reservation-service:
+    build: ./reservation-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://reservation-db:5432/reservation_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      DRIVER_SERVICE_URL: http://driver-service:8081
+    ports:
+      - "8082:8082"
+    depends_on:
+      - reservation-db
+      - driver-service
+
+  api-gateway:
+    build: ./api-gateway
+    environment:
+      SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_0_ID: driver-service
+      SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_0_URI: http://driver-service:8081
+      SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_0_PREDICATES_0: Path=/api/drivers/**,/api/auth/**
+      SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_1_ID: reservation-service
+      SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_1_URI: http://reservation-service:8082
+      SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_1_PREDICATES_0: Path=/api/reservations/**
+    ports:
+      - "8080:8080"
+    depends_on:
+      - driver-service
+      - reservation-service
+
+volumes:
+  driver-db-data:
+  reservation-db-data:

@@ -14,3 +14,7 @@ target/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Sensitive config files
+driver-service/src/main/resources/application.properties
+reservation-service/src/main/resources/application.properties
