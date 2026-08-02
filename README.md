@@ -8,26 +8,7 @@ Built as a hands-on project to gain practical Java/Spring Boot experience ahead 
 
 ## Architecture
 
-```
-                        ┌─────────────────────┐
-        Client ───────▶│     API Gateway      │   (port 8080, Spring Cloud Gateway)
-                        └──────────┬──────────┘
-                    ┌──────────────┴──────────────┐
-                    ▼                             ▼
-        ┌───────────────────────┐     ┌────────────────────────────┐
-        │    Driver Service     │     │   Reservation Service      │
-        │    (port 8081)        │     │   (port 8082)              │
-        │                       │     │                            │
-        │ - Driver registration │◀───│ - Validates driver exists  │
-        │ - JWT login/auth      │ API │   via authenticated REST   │
-        │ - Driver CRUD         │ key │   call to Driver Service   │
-        │                       │     │ - Reservation CRUD         │
-        └───────────┬───────────┘     └──────────────┬─────────────┘
-                    ▼                                 ▼
-            ┌───────────────┐                 ┌──────────────────┐
-            │  driver_db    │                 │  reservation_db  │
-            │  (PostgreSQL) │                 │  (PostgreSQL)    │
-            └───────────────┘                 └──────────────────┘
+![Architecture](/screenshots/Architecture.png)
 ```
 
 Each service owns its own database (database-per-service pattern) — there are no direct database joins across services. When Reservation Service needs to confirm a driver exists, it makes a real, authenticated HTTP call to Driver Service rather than reading its database directly.
