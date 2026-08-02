@@ -15,10 +15,12 @@ import com.parkease.driverservice.dto.DriverRequestDTO;
 import com.parkease.driverservice.dto.DriverResponseDTO;
 import com.parkease.driverservice.service.DriverService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/drivers")
+@SecurityRequirement(name = "bearerAuth")
 public class DriverController {
 
     private final DriverService driverService;
