@@ -9,7 +9,7 @@ Built as a hands-on project to gain practical Java/Spring Boot experience ahead 
 ## Architecture
 
 ![Architecture](/screenshots/Architecture.png)
-```
+
 
 Each service owns its own database (database-per-service pattern) — there are no direct database joins across services. When Reservation Service needs to confirm a driver exists, it makes a real, authenticated HTTP call to Driver Service rather than reading its database directly.
 
